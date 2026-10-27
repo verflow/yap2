@@ -104,18 +104,17 @@ int solve(int column, int done, int trans) {
 }
 void init_all_by_zero(void) {
 for (int i = 0; i < 26; i++) {
+	if (i < 20) {
+		for (int j = 0; j < 10; j++)
+			words[i][j] = 0;
+	}
+	if(i < 10) {
+	used[i] = 0;
+	need[i] = 0;
+	}
 letters_arr[i].character = (char)(i + 65);
 letters_arr[i].value = NOT_USED;
 }
-for (int i = 0; i < 20; i++) {
-	for (int j = 0; j < 10; j++)
-		words[i][j] = 0;
-}
-for (int i = 0; i < 10; i++) {
-	used[i] = 0;
-	need[i] = 0;
-}
-
 	K = 0; L = 0;
 }
 int main() {
