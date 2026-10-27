@@ -21,11 +21,9 @@ char need[10];//буквы, которые надо заменить
 int K, L; //К - число слов. L - максимальная длина.
 
 int letter_value(char a) {
-	for (int i = 0; i < 26; i++)
-		if (letters_arr[i].character == a)
-			return letters_arr[i].value;
-	return -1;
+	return letters_arr[(int)a - 65].value;
 }
+
 void printer(char* str) {
 	int i = 0;
 	while (str[i] != 0) {
@@ -105,18 +103,19 @@ int solve(int column, int done, int trans) {
 	}return 0;
 }
 void init_all_by_zero(void) {
-	for (int i = 0; i < 26; i++) {
-		letters_arr[i].character = (char)(i + 65);
-		letters_arr[i].value = NOT_USED;
-	}
-	for (int i = 0; i < 20; i++) {
-		for (int j = 0; j < 10; j++)
-			words[i][j] = 0;
-	}
-	for (int i = 0; i < 10; i++) {
-		used[i] = 0;
-		need[i] = 0;
-	}
+for (int i = 0; i < 26; i++) {
+letters_arr[i].character = (char)(i + 65);
+letters_arr[i].value = NOT_USED;
+}
+for (int i = 0; i < 20; i++) {
+	for (int j = 0; j < 10; j++)
+		words[i][j] = 0;
+}
+for (int i = 0; i < 10; i++) {
+	used[i] = 0;
+	need[i] = 0;
+}
+
 	K = 0; L = 0;
 }
 int main() {
