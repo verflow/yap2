@@ -16,7 +16,7 @@ struct letter {
 
 struct letter letters_arr[26];
 char words[20][10];
-int used[10];//использованные цифры
+char used[10];//использованные цифры
 char need[10];//буквы, которые надо заменить
 int K, L; //К - число слов. L - максимальная длина.
 
@@ -43,11 +43,11 @@ int numbers_need(int num) {
 	return 0;
 }
 
-int znak(char* word, int num) {
+/*int znak(char* word, int num) {
 	char c = word[9 - num];
 	if (c == 0) return 0;
 	return letter_value(c);
-}
+}*/
 
 int parser(char* str) {
 	int i = 0; char w[10] = { 0 }; int j = 0; int k = 0;
@@ -82,25 +82,40 @@ int parser(char* str) {
 	return k;
 }
 int solve(int column, int done, int trans) {
+	int last = K - 1;
+
 	while (column < L && !numbers_need(column)) {
 		int sum = trans;
-		for (int i = 0; i < (K - 1); i++)
-			sum += znak(words[i], column);
-		if ((sum % 10) != znak(words[K - 1], column)) return 0;
+		int pos = 9 - column;
+		for (int i = 0; i < (last); i++) {
+			//sum += znak(words[i], column);
+			char c = words[i][pos];
+			if (c != 0) sum += letter_value(c);
+		}
+		char c_last = words[last][pos];
+		int res;
+		if (c_last) res = letter_value(c_last);// sum += znak
+		else res = 0;
+		if ((sum % 10) != res) return 0;
 		trans = sum / 10;
 		column++;
 	}
 	if (L == column) return trans == 0;
+	struct letter* cur = &letters_arr[need[done] - 65];
+	int old = cur->value;
 	for (int i = 0; i < 10; i++) {
 		if (used[i]) continue;
-		int old = letters_arr[need[done] - 65].value;
+		//int old = letters_arr[need[done] - 65].value;
 		if (old == FIRST && i == 0)continue;
-		letters_arr[need[done] - 65].value = i; //забавный момент
+		//letters_arr[need[done] - 65].value = i; //забавный момент
+		cur->value = i;
 		used[i] = 1;
 		if (solve(column, done + 1, trans)) return 1;
-		letters_arr[need[done] - 65].value = old;
+		//letters_arr[need[done] - 65].value = old;
 		used[i] = 0;
-	}return 0;
+	}
+	cur->value = old;
+	return 0;
 }
 void init_all_by_zero(void) {
 for (int i = 0; i < 26; i++) {
@@ -119,22 +134,38 @@ letters_arr[i].value = NOT_USED;
 }
 int main() {
 	char path[64];
-	printf("get path inside\n");
-	scanf("%63s", path);
-	FILE* f = fopen(path, "r");
-	if (f == NULL) return 1;
-	char str[64] = { 0 };
+	printf("1- from keyboard \n2- from file\n");
+	int a;
+	scanf("%d", &a);
+	char c = getchar();
+	if (a == 2) {
+		printf("get path inside\n");
+		scanf("%63s", path);
+		FILE* f = fopen(path, "r");
+		if (f == NULL) return 1;
+		char str[64] = { 0 };
 
-	clock_t total = 0;
-	clock_t t0 = clock();
-	while (fgets(str, 64, f)) {
+		clock_t total = 0;
+		clock_t t0 = clock();
+		while (fgets(str, 64, f)) {
+			init_all_by_zero();
+			parser(str);
+			if (solve(0, 0, 0))
+				printer(str);
+			else printf("no solution");
+		}
+
+		fclose(f);
+		total += clock() - t0;
+		printf("\nsolve: %.3f ms\n", 1000.0 * total / CLOCKS_PER_SEC);
+	}
+	else {
+		char str[64] = { 0 };
+		fgets(str, 64, stdin);
 		init_all_by_zero();
 		parser(str);
 		if (solve(0, 0, 0))
 			printer(str);
 		else printf("no solution");
 	}
-	fclose(f);
-	total += clock() - t0;
-	printf("\nsolve: %.3f ms\n", 1000.0 * total / CLOCKS_PER_SEC);
 }
